@@ -15,6 +15,8 @@ export default function NewPasswordPage() {
     notes?: string;
   }) => {
     try {
+      console.log("Submitting password data:", { ...data, password: '[HIDDEN]' });
+      
       const response = await fetch("/api/passwords", {
         method: "POST",
         headers: {
@@ -23,14 +25,23 @@ export default function NewPasswordPage() {
         body: JSON.stringify(data),
       });
 
+      console.log("Response status:", response.status);
+      
       if (!response.ok) {
-        throw new Error("Failed to create password entry");
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        console.error("API Error:", errorData);
+        throw new Error(errorData.details || errorData.error || "Failed to create password entry");
       }
 
+      const result = await response.json();
+      console.log("Password created successfully:", result.id);
+      
       toast.success("Password saved successfully!");
       router.push("/");
     } catch (error) {
-      toast.error("Failed to save password");
+      console.error("Error saving password:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to save password";
+      toast.error(errorMessage);
     }
   };
 
