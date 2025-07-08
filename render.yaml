@@ -20,5 +20,7 @@ services:
         fromDatabase:
           name: password-saver-db
           property: connectionString
+      - key: PORT
+        value: "10000"
     # Health checks
     healthCheckPath: /api/test-db
