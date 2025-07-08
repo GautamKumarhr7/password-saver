@@ -1,4 +1,12 @@
 services:
+  - type: pserv
+    name: password-saver-db
+    env: postgres
+    plan: free
+    disk:
+      name: password-saver-db-disk
+      size: 1GB
+  
   - type: web
     name: password-saver
     env: node
@@ -14,10 +22,3 @@ services:
           property: connectionString
     # Health checks
     healthCheckPath: /api/test-db
-  - type: pserv
-    name: password-saver-db
-    env: postgres
-    plan: free
-    disk:
-      name: password-saver-db-disk
-      size: 1GB
