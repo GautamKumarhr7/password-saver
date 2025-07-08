@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: password-saver
+    env: node
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: password-saver-db
+          property: connectionString
+    # Run migrations before starting the service
+    plan: free
+  - type: pserv
+    name: password-saver-db
+    env: postgres
+    plan: free
+    disk:
+      name: password-saver-db-disk
+      size: 1GB
