@@ -17,19 +17,30 @@ interface PasswordEntry {
 export default function EditPasswordPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const router = useRouter();
   const [password, setPassword] = useState<PasswordEntry | null>(null);
   const [loading, setLoading] = useState(true);
+  const [id, setId] = useState<string>("");
 
   useEffect(() => {
-    fetchPassword();
-  }, [params.id]);
+    async function resolveParams() {
+      const resolvedParams = await params;
+      setId(resolvedParams.id);
+    }
+    resolveParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (id) {
+      fetchPassword();
+    }
+  }, [id]);
 
   const fetchPassword = async () => {
     try {
-      const response = await fetch(`/api/passwords/${params.id}`);
+      const response = await fetch(`/api/passwords/${id}`);
       if (!response.ok) {
         throw new Error("Failed to fetch password");
       }
@@ -46,7 +57,7 @@ export default function EditPasswordPage({
 
   const handleSubmit = async (data: Omit<PasswordEntry, "id">) => {
     try {
-      const response = await fetch(`/api/passwords/${params.id}`, {
+      const response = await fetch(`/api/passwords/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

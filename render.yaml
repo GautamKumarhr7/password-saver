@@ -2,7 +2,8 @@ services:
   - type: web
     name: password-saver
     env: node
-    buildCommand: npm install && npx prisma generate && npm run build
+    plan: free
+    buildCommand: npm ci && npx prisma generate && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -11,8 +12,8 @@ services:
         fromDatabase:
           name: password-saver-db
           property: connectionString
-    # Run migrations before starting the service
-    plan: free
+    # Health checks
+    healthCheckPath: /
   - type: pserv
     name: password-saver-db
     env: postgres

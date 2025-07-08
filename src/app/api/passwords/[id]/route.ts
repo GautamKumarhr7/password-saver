@@ -3,12 +3,13 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const password = await prisma.passwordEntry.findUnique({
       where: {
-        id: params.id,
+        id: id,
       },
     });
 
@@ -31,15 +32,16 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { title, username, password, website, notes } = body;
 
     const updatedPassword = await prisma.passwordEntry.update({
       where: {
-        id: params.id,
+        id: id,
       },
       data: {
         title,
@@ -62,12 +64,13 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await prisma.passwordEntry.delete({
       where: {
-        id: params.id,
+        id: id,
       },
     });
 
@@ -75,6 +78,7 @@ export async function DELETE(
       message: "Password entry deleted successfully",
     });
   } catch (error) {
+    console.error("Error deleting password:", error);
     return NextResponse.json(
       { error: "Failed to delete password entry" },
       { status: 500 }
