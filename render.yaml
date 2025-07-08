@@ -12,7 +12,7 @@ services:
     env: node
     plan: free
     buildCommand: npm ci && npx prisma generate && npm run build
-    startCommand: npm run db:setup && npm start
+    startCommand: npx prisma db push --accept-data-loss && npm start
     envVars:
       - key: NODE_ENV
         value: production
