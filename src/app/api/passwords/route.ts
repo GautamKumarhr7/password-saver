@@ -1,14 +1,55 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const passwords = await prisma.passwordEntry.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || '';
+
+    // Calculate offset for pagination
+    const offset = (page - 1) * limit;
+
+    // Build where clause for search
+    const where = search ? {
+      OR: [
+        { title: { contains: search, mode: 'insensitive' as const } },
+        { username: { contains: search, mode: 'insensitive' as const } },
+        { website: { contains: search, mode: 'insensitive' as const } },
+        { notes: { contains: search, mode: 'insensitive' as const } }
+      ]
+    } : {};
+
+    // Get passwords with pagination
+    const [passwords, totalCount] = await Promise.all([
+      prisma.passwordEntry.findMany({
+        where,
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip: offset,
+        take: limit,
+      }),
+      prisma.passwordEntry.count({ where })
+    ]);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / limit);
+    const hasNext = page < totalPages;
+    const hasPrev = page > 1;
+
+    return NextResponse.json({
+      passwords,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit,
+        hasNext,
+        hasPrev
+      }
     });
-    return NextResponse.json(passwords);
   } catch (error) {
     console.error("Error fetching passwords:", error);
     return NextResponse.json(

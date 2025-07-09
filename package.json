@@ -11,9 +11,7 @@
     "deploy": "./scripts/deploy.sh",
     "db:migrate": "prisma migrate deploy",
     "db:generate": "prisma generate",
-    "db:setup": "prisma generate && (prisma migrate deploy || prisma db push)",
-    "render-build": "npm ci && npx prisma generate && npm run build",
-    "render-start": "npx prisma db push --accept-data-loss && npm start"
+    "db:setup": "prisma generate && (prisma migrate deploy || prisma db push)"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
