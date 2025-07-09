@@ -8,16 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id              String          @id @default(cuid())
-  email           String          @unique
-  password        String
-  name            String?
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  passwordEntries PasswordEntry[]
-}
-
 model PasswordEntry {
   id        String   @id @default(cuid())
   title     String
@@ -25,10 +15,9 @@ model PasswordEntry {
   password  String
   website   String?
   notes     String?
-  userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
+  @@index([title])
+  @@index([createdAt])
 }

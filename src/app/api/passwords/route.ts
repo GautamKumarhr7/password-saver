@@ -77,26 +77,6 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("Checking for existing user...");
-    
-    // First, check if a user exists, if not create one
-    let user = await prisma.user.findFirst();
-
-    if (!user) {
-      console.log("No user found, creating default user...");
-      // Create a default user if none exists
-      user = await prisma.user.create({
-        data: {
-          email: "default@example.com",
-          password: "defaultpassword", // In a real app, this should be hashed
-          name: "Default User",
-        },
-      });
-      console.log("Created user:", user.id);
-    } else {
-      console.log("Found existing user:", user.id);
-    }
-
     console.log("Creating password entry...");
     
     const passwordEntry = await prisma.passwordEntry.create({
@@ -106,7 +86,6 @@ export async function POST(request: Request) {
         password,
         website,
         notes,
-        userId: user.id,
       },
     });
 

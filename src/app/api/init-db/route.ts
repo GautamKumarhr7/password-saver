@@ -5,23 +5,7 @@ export async function POST() {
   try {
     console.log("🔧 Initializing database tables...");
     
-    // Try to create tables using Prisma's $executeRaw
-    await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS "User" (
-        "id" TEXT NOT NULL,
-        "email" TEXT NOT NULL,
-        "password" TEXT NOT NULL,
-        "name" TEXT,
-        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" TIMESTAMP(3) NOT NULL,
-        CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-      );
-    `;
-
-    await prisma.$executeRaw`
-      CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
-    `;
-
+    // Create PasswordEntry table only
     await prisma.$executeRaw`
       CREATE TABLE IF NOT EXISTS "PasswordEntry" (
         "id" TEXT NOT NULL,
@@ -30,7 +14,6 @@ export async function POST() {
         "password" TEXT NOT NULL,
         "website" TEXT,
         "notes" TEXT,
-        "userId" TEXT NOT NULL,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL,
         CONSTRAINT "PasswordEntry_pkey" PRIMARY KEY ("id")
@@ -38,13 +21,11 @@ export async function POST() {
     `;
 
     await prisma.$executeRaw`
-      CREATE INDEX IF NOT EXISTS "PasswordEntry_userId_idx" ON "PasswordEntry"("userId");
+      CREATE INDEX IF NOT EXISTS "PasswordEntry_title_idx" ON "PasswordEntry"("title");
     `;
 
     await prisma.$executeRaw`
-      ALTER TABLE "PasswordEntry" 
-      ADD CONSTRAINT IF NOT EXISTS "PasswordEntry_userId_fkey" 
-      FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+      CREATE INDEX IF NOT EXISTS "PasswordEntry_createdAt_idx" ON "PasswordEntry"("createdAt");
     `;
 
     console.log("✅ Database tables created successfully!");

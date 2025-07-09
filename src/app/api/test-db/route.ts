@@ -9,10 +9,6 @@ export async function GET() {
     await prisma.$connect();
     console.log("Database connection successful");
     
-    // Try to count users
-    const userCount = await prisma.user.count();
-    console.log("User count:", userCount);
-    
     // Try to count password entries
     const passwordCount = await prisma.passwordEntry.count();
     console.log("Password entry count:", passwordCount);
@@ -20,7 +16,6 @@ export async function GET() {
     return NextResponse.json({
       status: "success",
       database: "connected",
-      userCount,
       passwordCount,
       timestamp: new Date().toISOString()
     });
